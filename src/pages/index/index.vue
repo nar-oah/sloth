@@ -17,7 +17,7 @@
       <text>{{ exchange * 100 }}分钟赎罪券</text>
       <uni-icons
         type="checkbox-filled"
-        size="32"
+        size="28"
         color="#2979FF"
         @click="title = exchange == 0 ? '你在拿我寻开心？' : submitExchange()"
       ></uni-icons>
@@ -28,7 +28,7 @@
     <uni-easyinput
       :disabled="isMonth"
       v-model="month"
-      placeholder="输入灵感以开始..."
+      placeholder="输入计划以开始..."
       placeholderStyle="font-size:24rpx"
       :suffixIcon="isMonth ? 'compose' : 'checkmarkempty'"
       @iconClick="isMonth ? (isMonth = !isMonth) : submitMonth()"
@@ -39,7 +39,7 @@
     <uni-easyinput
       :disabled="isWeek"
       v-model="week"
-      placeholder="输入灵感以开始..."
+      placeholder="输入计划以开始..."
       placeholderStyle="font-size:24rpx"
       :suffixIcon="isWeek ? 'compose' : 'checkmarkempty'"
       @iconClick="isWeek ? (isWeek = month.length == 0) : submitWeek()"
@@ -102,8 +102,10 @@ async function submitMonth() {
 }
 async function submitWeek() {
   isWeek.value = true;
+  items.value[0] = "思考中...";
   currentWeek.info = week.value;
   await callWrit();
+  items.value[0] = "未安排";
 }
 
 function handleSwitch(e: any) {

@@ -52,6 +52,7 @@
     "@dcloudio/uni-quickapp-webview": "3.0.0-4030620241128001",
     "@dcloudio/uni-ui": "^1.5.10",
     "@google/genai": "^1.14.0",
+    "axios": "^1.11.0",
     "date-fns": "^4.1.0",
     "vue": "^3.4.21",
     "vue-i18n": "^9.1.9"
