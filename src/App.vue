@@ -7,7 +7,7 @@ onLaunch(() => {
 });
 onShow(() => {
   console.log("App Show");
-  getOverdue().forEach(async (writId: number) => await callTodo(writId));
+  getOverdue().forEach((writId: number) => callTodo(writId));
 });
 onHide(() => {
   console.log("App Hide");

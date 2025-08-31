@@ -3,6 +3,7 @@ import { getSuggest, getWrit, getTodo } from "@/sdk/api";
 import type { TodoRes } from "@/sdk/api";
 import { sloth, currentTarget, currentWeek } from "@/sdk/db";
 import type { WeekInfo, Writ, Part } from "@/sdk/db";
+import { tabs } from "@/sdk/state";
 
 const currentDate: Date = new Date();
 
@@ -29,6 +30,13 @@ export async function callWrit(): Promise<void> {
 }
 
 export async function callTodo(writID: number): Promise<void> {
+  const initPart: Part = {
+    name: "思考中...",
+    value: 0,
+    todos: [],
+  };
+  sloth.value.writ[writID].parts = [initPart];
+  tabs.value[1] = "思考中...";
   const task: string = sloth.value.writ[writID].name;
   const contents: string = `任务内容：${task}\n目标：${currentWeek.info}`;
   const res: TodoRes[] = await getTodo(contents);
@@ -40,8 +48,6 @@ export async function callTodo(writID: number): Promise<void> {
       context: context,
     })),
   }));
-  console.log("before:", task, writID, contents, res, parts, sloth.value.writ);
-
   sloth.value.writ[writID].parts = parts;
-  console.log("after:", sloth.value.writ);
+  tabs.value[1] = "已安排";
 }

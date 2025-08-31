@@ -59,7 +59,7 @@
 
   <uni-segmented-control
     :current="current"
-    :values="items"
+    :values="tabs"
     @clickItem="handleSwitch"
     styleType="button"
     activeColor="#007aff"
@@ -74,6 +74,7 @@
 import { ref } from "vue";
 import { callSuggest, callWrit } from "@/sdk/call";
 import { currentDeal, currentTarget, currentWeek } from "@/sdk/db";
+import { tabs } from "@/sdk/state";
 
 const title = ref("来一笔怠惰的交易？");
 const exchange = ref<number>(0.0);
@@ -82,7 +83,6 @@ const week = ref<string>(currentWeek.info);
 const suggest = ref<string[]>([]);
 const isMonth = ref<boolean>(month.value.length != 0);
 const isWeek = ref<boolean>(week.value.length != 0 || !isMonth.value);
-const items = ref(["未安排", "已安排", "分析"]);
 const current = ref(0);
 
 function updateExchange(value: number) {
@@ -102,10 +102,10 @@ async function submitMonth() {
 }
 async function submitWeek() {
   isWeek.value = true;
-  items.value[0] = "思考中...";
+  tabs.value[0] = "思考中...";
   currentWeek.info = week.value;
   await callWrit();
-  items.value[0] = "未安排";
+  tabs.value[0] = "未安排";
 }
 
 function handleSwitch(e: any) {

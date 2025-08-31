@@ -32,7 +32,7 @@ import { ref } from "vue";
 import { sloth, updateTodo } from "@/sdk/db";
 import type { Writ } from "@/sdk/db";
 
-const writs = ref<Writ[]>(
+let writs = ref<Writ[]>(
   sloth.value.writ.filter((writ: Writ) => writ.parts.length),
 );
 </script>
