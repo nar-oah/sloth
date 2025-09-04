@@ -3,7 +3,7 @@
     :title="title"
     :extra="`剩余难度点：${(currentDeal.total - currentDeal.exchange).toFixed(2)}`"
   >
-    <view class="exchange">
+    <view v-if="!time" class="exchange">
       <uni-number-box
         :max="currentDeal.total - currentDeal.exchange"
         :value="exchange"
@@ -14,13 +14,25 @@
       />
       <text>难度点</text>
       <uni-icons type="arrow-right" size="28" color="red"></uni-icons>
-      <text>{{ exchange * 100 }}分钟赎罪券</text>
+      <text>{{ exchange * 60 }}分钟赎罪券</text>
       <uni-icons
         type="checkbox-filled"
-        size="28"
+        size="22"
         color="#2979FF"
         @click="title = exchange == 0 ? '你在拿我寻开心？' : submitExchange()"
       ></uni-icons>
+    </view>
+    <view v-else class="time">
+      <uni-countdown
+        :font-size="16"
+        color="#FFFFFF"
+        background-color="#007AFF"
+        :show-day="false"
+        :show-colon="false"
+        :minute="time"
+        @timeup="handleTimeup()"
+      />
+      <text>后赎罪券过期</text>
     </view>
   </uni-card>
 
@@ -78,6 +90,7 @@ import { tabs } from "@/sdk/state";
 
 const title = ref("来一笔怠惰的交易？");
 const exchange = ref<number>(0.0);
+const time = ref<number>(0);
 const month = ref<string>(currentTarget.month);
 const week = ref<string>(currentWeek.info);
 const suggest = ref<string[]>([]);
@@ -91,8 +104,16 @@ function updateExchange(value: number) {
 }
 function submitExchange(): string {
   currentDeal.value.exchange += Math.trunc(exchange.value * 100) / 100;
+  time.value = exchange.value * 60;
   exchange.value = 0.0;
   return "愉快的交易";
+}
+function handleTimeup() {
+  uni.showToast({
+    title: "赎罪券过期",
+  });
+  time.value = 0;
+  title.value = "来一笔怠惰的交易？";
 }
 
 async function submitMonth() {
@@ -122,6 +143,11 @@ function handleSwitch(e: any) {
   justify-content: center;
   flex-wrap: wrap;
   gap: 10rpx;
+}
+.time {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .tags {
   display: flex;

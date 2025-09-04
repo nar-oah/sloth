@@ -7,17 +7,25 @@
 </template>
 
 <script setup lang="ts">
-import { isSameWeek } from "date-fns";
+import { isSameWeek, getISODay } from "date-fns";
 import { sloth } from "@/sdk/db";
 import type { Deal } from "@/sdk/db";
 
 const today = new Date();
+const totals: number[] = Array(7).fill(0);
+const exchanges: number[] = Array(7).fill(0);
+const margins: number[] = Array(7).fill(0);
 const deals: Deal[] = sloth.value.deal.filter((deal: Deal) =>
-  isSameWeek(deal.day, today),
+  isSameWeek(deal.day, today, { weekStartsOn: 1 }),
 );
-const testTotal = [4, 6, 2, 5, 8, 4, 1];
-const testExchange = [2, 4, 1, 0, 7, 1, 0];
-const testMargin = [2, 2, 1, 5, 1, 3, 1];
+
+for (const deal of deals) {
+  const dayIndex = getISODay(deal.day) - 1;
+  totals[dayIndex] = deal.total;
+  exchanges[dayIndex] = deal.exchange;
+  margins[dayIndex] = deal.total - deal.exchange;
+}
+
 const option = {
   xAxis: {
     show: true,
@@ -29,24 +37,19 @@ const option = {
   series: [
     {
       name: "总量",
-      data: deals.map((deal: Deal) => deal.total),
-      // data: testTotal,
+      data: totals,
       type: "line",
     },
     {
       name: "怠惰量",
-      data: deals.map((deal: Deal) => deal.exchange),
-      // data: testExchange,
+      data: exchanges,
       type: "line",
     },
     {
       name: "差值",
-      data: deals.map((deal: Deal) => deal.total - deal.exchange),
-      // data: testMargin,
+      data: margins,
       type: "line",
     },
   ],
 };
 </script>
-
-<style lang="scss"></style>

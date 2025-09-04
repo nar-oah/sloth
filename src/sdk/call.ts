@@ -30,13 +30,13 @@ export async function callWrit(): Promise<void> {
 }
 
 export async function callTodo(writID: number): Promise<void> {
+  tabs.value[1] = "思考中...";
   const initPart: Part = {
     name: "思考中...",
     value: 0,
     todos: [],
   };
   sloth.value.writ[writID].parts = [initPart];
-  tabs.value[1] = "思考中...";
   const task: string = sloth.value.writ[writID].name;
   const contents: string = `任务内容：${task}\n目标：${currentWeek.info}`;
   const res: TodoRes[] = await getTodo(contents);

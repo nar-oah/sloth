@@ -96,7 +96,11 @@ export function updateTodo(writId: number, partId: number, map: number[]) {
 export function getOverdue(): number[] {
   const currentDate: Date = new Date();
   return sloth.value.writ.reduce((res: number[], writ: Writ, index: number) => {
-    if (isAfter(currentDate, writ.due) && !writ.parts.length) res.push(index);
+    if (
+      (isAfter(currentDate, writ.due) && !writ.parts.length) ||
+      (writ.parts.length == 1 && writ.parts[0].value == 0)
+    )
+      res.push(index);
     return res;
   }, []);
 }
