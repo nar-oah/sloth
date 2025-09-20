@@ -1,2 +1,2 @@
 import { ref } from "vue";
-export const tabs = ref(["未安排", "已安排", "分析"]);
+export const tabs = ref(["安排", "待办", "分析"]);

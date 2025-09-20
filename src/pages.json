@@ -4,7 +4,8 @@
 		"custom": {
 			// uni-ui 规则如下配置
 			"^uni-(.*)": "@dcloudio/uni-ui/lib/uni-$1/uni-$1.vue",
-			"^tab-(.*)": "@/components/tab-$1.vue" // 匹配tab目录内的vue文件
+			"^tab-(.*)": "@/components/tab-$1.vue",
+			"^adm-(.*)": "@/admUI/adm-$1.vue" // 匹配admUI目录内的vue文件
 		}
 	},
 	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
@@ -21,6 +22,6 @@
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "sloth",
 		"navigationBarBackgroundColor": "#F8F8F8",
-		"backgroundColor": "#F8F8F8"
+		"backgroundColor": "#36282B"
 	}
 }

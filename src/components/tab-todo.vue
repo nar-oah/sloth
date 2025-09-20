@@ -1,44 +1,30 @@
 <template>
-  <uni-collapse>
-    <uni-collapse-item v-for="(writ, id) in writs" :key="id" :title="writ.name">
-      <uni-section
-        v-for="(part, index) in writ.parts"
-        :key="index"
-        :title="`${part.name}(难度：${part.value})`"
-        type="line"
-      >
-        <uni-data-checkbox
-          class="todo"
-          multiple
-          :value="
-            part.todos
-              .map((todo, index) => (todo.isComplete == true ? index : -1))
-              .filter((i) => i !== -1)
-          "
-          :localdata="
-            part.todos.map((todo, index) => {
-              return { value: index, text: todo.context };
-            })
-          "
-          @change="updateTodo(id, index, $event.detail.value)"
-        ></uni-data-checkbox>
-      </uni-section>
-    </uni-collapse-item>
-  </uni-collapse>
+  <adm-collapse v-for="(writ, id) in writs" :key="id" :title="writ.name">
+    <view v-for="(part, index) in writ.parts" :key="index">
+      <adm-message>{{ part.name }}(难度：{{ part.value }})</adm-message>
+      <adm-todo-list
+        :list="part.todos"
+        @change="updateTodo(id, index, $event.detail.value)"
+      ></adm-todo-list>
+    </view>
+  </adm-collapse>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { sloth, updateTodo } from "@/sdk/db";
-import type { Writ } from "@/sdk/db";
+import { sloth, currentDeal } from "@/sdk/db";
+import type { Writ, Part, Todo } from "@/sdk/db";
 
 let writs = ref<Writ[]>(
   sloth.value.writ.filter((writ: Writ) => writ.parts.length),
 );
-</script>
 
-<style lang="scss">
-.todo {
-  margin-left: 20rpx;
+function updateTodo(writId: number, partId: number, todos: Todo[]) {
+  const currentPart: Part = sloth.value.writ[writId].parts[partId];
+  currentPart.todos = todos;
+  const partComplete: boolean = currentPart.todos.every(
+    (todo: Todo) => todo.isComplete,
+  );
+  if (partComplete) currentDeal.value.total += currentPart.value;
 }
-</style>
+</script>

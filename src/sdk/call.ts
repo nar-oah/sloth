@@ -30,7 +30,7 @@ export async function callWrit(): Promise<void> {
 }
 
 export async function callTodo(writID: number): Promise<void> {
-  tabs.value[1] = "思考中...";
+  tabs.value[1] = "思考";
   const initPart: Part = {
     name: "思考中...",
     value: 0,

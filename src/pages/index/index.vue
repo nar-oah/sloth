@@ -1,96 +1,71 @@
 <template>
-  <uni-card
-    :title="title"
-    :extra="`剩余难度点：${(currentDeal.total - currentDeal.exchange).toFixed(2)}`"
-  >
-    <view v-if="!time" class="exchange">
-      <uni-number-box
-        :max="currentDeal.total - currentDeal.exchange"
-        :value="exchange"
-        :step="0.1"
-        background="#2979FF"
-        color="#fff"
-        @change="updateExchange($event)"
-      />
-      <text>难度点</text>
-      <uni-icons type="arrow-right" size="28" color="red"></uni-icons>
-      <text>{{ exchange * 60 }}分钟赎罪券</text>
-      <uni-icons
-        type="checkbox-filled"
-        size="22"
-        color="#2979FF"
-        @click="title = exchange == 0 ? '你在拿我寻开心？' : submitExchange()"
-      ></uni-icons>
-    </view>
-    <view v-else class="time">
-      <uni-countdown
-        :font-size="16"
-        color="#FFFFFF"
-        background-color="#007AFF"
-        :show-day="false"
-        :show-colon="false"
-        :minute="time"
-        @timeup="handleTimeup()"
-      />
-      <text>后赎罪券过期</text>
-    </view>
-  </uni-card>
-
-  <uni-card class="tags" title="月度计划">
-    <uni-easyinput
-      :disabled="isMonth"
-      v-model="month"
-      placeholder="输入计划以开始..."
-      placeholderStyle="font-size:24rpx"
-      :suffixIcon="isMonth ? 'compose' : 'checkmarkempty'"
-      @iconClick="isMonth ? (isMonth = !isMonth) : submitMonth()"
-    ></uni-easyinput>
-  </uni-card>
-
-  <uni-card class="tags" title="周度计划">
-    <uni-easyinput
-      :disabled="isWeek"
-      v-model="week"
-      placeholder="输入计划以开始..."
-      placeholderStyle="font-size:24rpx"
-      :suffixIcon="isWeek ? 'compose' : 'checkmarkempty'"
-      @iconClick="isWeek ? (isWeek = month.length == 0) : submitWeek()"
-    ></uni-easyinput>
-    <view class="tags">
-      <uni-tag
-        v-show="!isWeek"
-        v-for="(tag, tagIndex) in suggest"
-        :key="tagIndex"
-        :text="tag"
-        type="primary"
-        :circle="true"
-        @click="week = tag"
-      ></uni-tag>
-    </view>
-  </uni-card>
-
-  <uni-segmented-control
+  <adm-seal>
+    <adm-grop-li>
+      <adm-grop icon="交易">
+        <text>{{ title }}</text>
+        <text> 剩餘難度點：{{ remaining }} </text>
+        <adm-number-box
+          v-if="!time"
+          :max="remaining"
+          :value="exchange"
+          :step="0.1"
+          @change="updateExchange($event)"
+        >
+          <text>難度點</text>
+          <adm-button data="换"></adm-button>
+          <text>{{ exchange * 60 }}分鐘贖罪券</text>
+          <adm-button
+            @click="
+              title = exchange == 0 ? '你在拿我寻开心？' : submitExchange()
+            "
+            data="确"
+          ></adm-button>
+        </adm-number-box>
+        <adm-countdown v-else :targetTime="date" @finish="handleTimeup()">
+          後贖罪券過期
+        </adm-countdown>
+      </adm-grop>
+      <adm-grop icon="计划">
+        <adm-input @confirm="submitMonth($event.detail.value)">
+          月度計畫
+        </adm-input>
+        <adm-input @confirm="submitWeek($event.detail.value)">
+          周度計畫
+        </adm-input>
+        <text v-if="!isWeek" v-for="(tag, index) in suggest" :key="index">
+          {{ tag }}
+        </text>
+      </adm-grop>
+    </adm-grop-li>
+    <tab-wait v-show="current === 0"></tab-wait>
+    <tab-todo v-if="current === 1"></tab-todo>
+    <tab-analyze v-if="current === 2"></tab-analyze>
+  </adm-seal>
+  <adm-bottom
+    style="z-index: 3"
     :current="current"
-    :values="tabs"
-    @clickItem="handleSwitch"
-    styleType="button"
-    activeColor="#007aff"
-  ></uni-segmented-control>
-
-  <view v-show="current === 0"><tab-wait></tab-wait></view>
-  <view v-if="current === 1"><tab-todo></tab-todo></view>
-  <view v-if="current === 2"><tab-analyze></tab-analyze></view>
+    @clickItem="handleSwitch($event)"
+    :bottom-arr="tabs"
+  ></adm-bottom>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, ref } from "vue";
 import { callSuggest, callWrit } from "@/sdk/call";
 import { currentDeal, currentTarget, currentWeek } from "@/sdk/db";
 import { tabs } from "@/sdk/state";
+import { addMinutes } from "date-fns";
 
-const title = ref("来一笔怠惰的交易？");
+const title = ref("來一筆怠惰的交易？");
+const remaining = computed(() =>
+  (currentDeal.value.total - currentDeal.value.exchange).toFixed(2),
+);
 const exchange = ref<number>(0.0);
 const time = ref<number>(0);
+const date = computed((): Date => {
+  const current = new Date();
+  return addMinutes(current, time.value);
+});
 const month = ref<string>(currentTarget.month);
 const week = ref<string>(currentWeek.info);
 const suggest = ref<string[]>([]);
@@ -99,59 +74,41 @@ const isWeek = ref<boolean>(week.value.length != 0 || !isMonth.value);
 const current = ref(0);
 
 function updateExchange(value: number) {
-  title.value = value > exchange.value ? "对，就是这样" : "不，这还不够";
+  title.value = value > exchange.value ? "對，就是這樣" : "不，這還不够";
   exchange.value = value;
+  console.log(value, exchange.value);
 }
 function submitExchange(): string {
   currentDeal.value.exchange += Math.trunc(exchange.value * 100) / 100;
   time.value = exchange.value * 60;
+  console.log(time.value, exchange.value);
   exchange.value = 0.0;
   return "愉快的交易";
 }
 function handleTimeup() {
   uni.showToast({
-    title: "赎罪券过期",
+    title: "贖罪券過期",
   });
   time.value = 0;
-  title.value = "来一笔怠惰的交易？";
+  title.value = "來一筆怠惰的交易？";
 }
 
-async function submitMonth() {
+async function submitMonth(value: string) {
   isMonth.value = true;
-  currentTarget.month = month.value;
+  currentTarget.month = value;
   suggest.value = await callSuggest();
 }
-async function submitWeek() {
+async function submitWeek(value: string) {
   isWeek.value = true;
-  tabs.value[0] = "思考中...";
-  currentWeek.info = week.value;
+  tabs.value[0] = "思考";
+  currentWeek.info = value;
   await callWrit();
-  tabs.value[0] = "未安排";
+  tabs.value[0] = "安排";
 }
 
-function handleSwitch(e: any) {
-  if (current.value != e.currentIndex) {
-    current.value = e.currentIndex;
+function handleSwitch(index: number) {
+  if (current.value != index) {
+    current.value = index;
   }
 }
 </script>
-
-<style lang="scss">
-.exchange {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 10rpx;
-}
-.time {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10rpx;
-}
-</style>

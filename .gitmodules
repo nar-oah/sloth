@@ -1,0 +1,3 @@
+[submodule "src/admUI"]
+	path = src/admUI
+	url = git@pool.naroah.top:admUI.git
