@@ -6,7 +6,7 @@ export interface TodoRes {
 }
 
 const apiClient = axios.create({
-  baseURL: "https://api.naroah.top/api",
+  baseURL: "https://aws.naroah.top/sloth",
   timeout: 30000,
 });
 
