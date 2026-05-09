@@ -1,50 +1,44 @@
 <template>
   <adm-seal>
-    <adm-grop-li>
-      <adm-grop icon="交易">
-        <text>{{ title }}</text>
-        <text> 剩餘難度點：{{ remaining }} </text>
-        <adm-number-box
-          v-if="!time"
-          :max="remaining"
-          :value="exchange"
-          :step="0.1"
-          @change="updateExchange($event)"
-        >
-          <text>難度點</text>
-          <adm-button data="换"></adm-button>
-          <text>{{ exchange * 60 }}分鐘贖罪券</text>
-          <adm-button
-            @click="
-              title = exchange == 0 ? '你在拿我寻开心？' : submitExchange()
-            "
-            data="确"
-          ></adm-button>
-        </adm-number-box>
-        <adm-countdown v-else :targetTime="date" @finish="handleTimeup()">
-          後贖罪券過期
-        </adm-countdown>
-      </adm-grop>
-      <adm-grop icon="计划">
-        <adm-input @confirm="submitMonth($event.detail.value)">
-          月度計畫
-        </adm-input>
-        <adm-input @confirm="submitWeek($event.detail.value)">
-          周度計畫
-        </adm-input>
-        <text v-if="!isWeek" v-for="(tag, index) in suggest" :key="index">
-          {{ tag }}
-        </text>
-      </adm-grop>
-    </adm-grop-li>
-    <tab-wait v-show="current === 0"></tab-wait>
+    <adm-grop icon="交易">
+      <adm-message>{{ title }}</adm-message>
+      <adm-message> 剩餘難度點：{{ remaining.toString() }} </adm-message>
+      <adm-number-box
+        v-if="!time"
+        :max="remaining * 60"
+        :value="exchange * 60"
+        :step="6"
+        @change="updateExchange($event)"
+      >
+        <view>分鐘贖罪券</view>
+        <adm-button
+          @click="title = exchange == 0 ? '你在拿我尋開心？' : submitExchange()"
+          data="确"
+        ></adm-button>
+      </adm-number-box>
+      <adm-countdown v-else :targetTime="date" @finish="handleTimeup()">
+        後贖罪券過期
+      </adm-countdown>
+    </adm-grop>
+    <adm-grop icon="计划">
+      <adm-input @confirm="submitMonth($event)">
+        {{ month || "月度計畫" }}
+      </adm-input>
+      <adm-input @confirm="submitWeek($event)">
+        {{ week || "周度計畫" }}
+      </adm-input>
+      <adm-message v-for="(tag, index) in suggest" :key="index">
+        {{ tag }}
+      </adm-message>
+    </adm-grop>
+    <tab-wait v-if="current === 0"></tab-wait>
     <tab-todo v-if="current === 1"></tab-todo>
     <tab-analyze v-if="current === 2"></tab-analyze>
   </adm-seal>
   <adm-bottom
     style="z-index: 3"
     :current="current"
-    @clickItem="handleSwitch($event)"
+    @click="handleSwitch($event)"
     :bottom-arr="tabs"
   ></adm-bottom>
 </template>
@@ -55,10 +49,17 @@ import { callSuggest, callWrit } from "@/sdk/call";
 import { currentDeal, currentTarget, currentWeek } from "@/sdk/db";
 import { tabs } from "@/sdk/state";
 import { addMinutes } from "date-fns";
+import { deleteSeal, sealList } from "@/admUI/adm";
 
 const title = ref("來一筆怠惰的交易？");
 const remaining = computed(() =>
-  (currentDeal.value.total - currentDeal.value.exchange).toFixed(2),
+  parseFloat(
+    (
+      currentDeal.value.total -
+      currentDeal.value.exchange -
+      exchange.value
+    ).toFixed(2),
+  ),
 );
 const exchange = ref<number>(0.0);
 const time = ref<number>(0);
@@ -75,13 +76,11 @@ const current = ref(0);
 
 function updateExchange(value: number) {
   title.value = value > exchange.value ? "對，就是這樣" : "不，這還不够";
-  exchange.value = value;
-  console.log(value, exchange.value);
+  exchange.value = value / 60;
 }
 function submitExchange(): string {
   currentDeal.value.exchange += Math.trunc(exchange.value * 100) / 100;
   time.value = exchange.value * 60;
-  console.log(time.value, exchange.value);
   exchange.value = 0.0;
   return "愉快的交易";
 }
@@ -108,6 +107,10 @@ async function submitWeek(value: string) {
 
 function handleSwitch(index: number) {
   if (current.value != index) {
+    if (sealList.value.length > 2) {
+      const id = sealList.value[2].id;
+      deleteSeal(id, sealList.value.length - 2);
+    }
     current.value = index;
   }
 }

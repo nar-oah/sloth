@@ -49,5 +49,5 @@ export async function callTodo(writID: number): Promise<void> {
     })),
   }));
   sloth.value.writ[writID].parts = parts;
-  tabs.value[1] = "已安排";
+  tabs.value[1] = "待办";
 }

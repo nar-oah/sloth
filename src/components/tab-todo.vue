@@ -4,7 +4,7 @@
       <adm-message>{{ part.name }}(难度：{{ part.value }})</adm-message>
       <adm-todo-list
         :list="part.todos"
-        @change="updateTodo(id, index, $event.detail.value)"
+        @change="updateTodo(id, index, $event)"
       ></adm-todo-list>
     </view>
   </adm-collapse>
