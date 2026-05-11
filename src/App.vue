@@ -35,4 +35,14 @@ html {
 page {
   background-color: #36282b;
 }
+
+#gropContainer {
+  width: min(100vw, 960px);
+}
+
+.bottom-wrap {
+  left: 50%;
+  max-width: 960px;
+  transform: translateX(-50%);
+}
 </style>

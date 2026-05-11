@@ -23,5 +23,8 @@
 		"navigationBarTitleText": "sloth",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#36282B"
+		"maxWidth": 960,
+		"rpxCalcMaxDeviceWidth": 960,
+		"rpxCalcBaseDeviceWidth": 960
 	}
 }
