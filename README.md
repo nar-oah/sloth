@@ -2,6 +2,43 @@
 
 Sloth 是一个接入 AI 大模型服务、以“怠惰值”为核心机制的自动任务规划应用。用户只需要输入月度目标和周度目标，应用会调用大模型自动生成计划建议、任务书和待办拆解，并用怠惰值把工作、学习和娱乐时间放进同一套可管理的节奏里。
 
+它的使用节奏很直接：先让 AI 把目标写成可推进的任务书，再把任务拆成待办，最后用完成待办得到的怠惰值兑换休息时间。Sloth 试图把“今天该做什么”和“我可以休息多久”放到同一个闭环里。
+
+## 在线体验
+
+| 分支 | 定位 | 体验地址 |
+| --- | --- | --- |
+| `main` | 当前主线版本，展示最新功能与默认体验。 | [https://sloth.naroah.top/](https://sloth.naroah.top/) |
+| `stable-ui` | 业务稳定版，面向稳定的核心业务流程和 UI 体验。 | [https://stable-sloth.naroah.top/](https://stable-sloth.naroah.top/) |
+
+## 组件效果
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="./docs/writ.png" alt="任务书生成组件效果" width="220" />
+      <br />
+      <strong>AI 任务书</strong>
+      <br />
+      <sub>输入月度和周度目标后，生成可执行的任务方向。</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./docs/todo.png" alt="待办拆解组件效果" width="220" />
+      <br />
+      <strong>待办拆解</strong>
+      <br />
+      <sub>把任务继续拆成可勾选事项，并保留难度点。</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="./docs/analyze.png" alt="数据分析组件效果" width="220" />
+      <br />
+      <strong>数据分析</strong>
+      <br />
+      <sub>对本周怠惰值、兑换和任务节奏做可视化呈现。</sub>
+    </td>
+  </tr>
+</table>
+
 ## 功能概览
 
 - 录入月度计划和周度计划。
